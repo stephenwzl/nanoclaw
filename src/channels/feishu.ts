@@ -85,7 +85,11 @@ export class FeishuChannel implements Channel {
     }
   }
 
-  async sendMessage(jid: string, text: string, replyToId?: string): Promise<void> {
+  async sendMessage(
+    jid: string,
+    text: string,
+    replyToId?: string,
+  ): Promise<void> {
     if (!this.client) {
       throw new Error('飞书客户端未初始化');
     }
@@ -149,7 +153,11 @@ export class FeishuChannel implements Channel {
 
   ownsJid(jid: string): boolean {
     // 飞书的 jid 格式: "feishu:chat_id" 或 "p2p:chat_id"
-    return jid.startsWith('feishu:') || jid.startsWith('p2p:') || jid.startsWith('group:');
+    return (
+      jid.startsWith('feishu:') ||
+      jid.startsWith('p2p:') ||
+      jid.startsWith('group:')
+    );
   }
 
   async disconnect(): Promise<void> {
@@ -192,7 +200,10 @@ export class FeishuChannel implements Channel {
 
     // 只处理文本消息
     if (message_type !== 'text') {
-      logger.debug({ messageId: message_id, messageType: message_type }, '跳过非文本消息');
+      logger.debug(
+        { messageId: message_id, messageType: message_type },
+        '跳过非文本消息',
+      );
       return;
     }
 
@@ -238,7 +249,12 @@ export class FeishuChannel implements Channel {
     });
 
     logger.debug(
-      { chatType: chat_type, chatId: chat_id, senderName, text: text.slice(0, 50) },
+      {
+        chatType: chat_type,
+        chatId: chat_id,
+        senderName,
+        text: text.slice(0, 50),
+      },
       '飞书收到消息',
     );
   }

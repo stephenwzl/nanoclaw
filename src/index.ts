@@ -502,7 +502,9 @@ async function main(): Promise<void> {
   }
 
   if (channels.length === 0) {
-    throw new Error('没有启用的 channel，请在 .env 中设置 ENABLE_WHATSAPP=true 或 ENABLE_FEISHU=true');
+    throw new Error(
+      '没有启用的 channel，请在 .env 中设置 ENABLE_WHATSAPP=true 或 ENABLE_FEISHU=true',
+    );
   }
 
   // Start subsystems (independently of connection handler)
@@ -532,7 +534,7 @@ async function main(): Promise<void> {
     registerGroup,
     syncGroupMetadata: (force) =>
       ENABLE_WHATSAPP
-        ? whatsapp?.syncGroupMetadata(force) ?? Promise.resolve()
+        ? (whatsapp?.syncGroupMetadata(force) ?? Promise.resolve())
         : Promise.resolve(),
     getAvailableGroups,
     writeGroupsSnapshot: (gf, im, ag, rj) =>
