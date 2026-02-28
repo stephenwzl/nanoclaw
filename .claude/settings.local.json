@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash:*)",
+      "Bash(npx tsx:*)",
+      "Bash(open -a Docker)",
+      "Bash(docker info:*)",
+      "Bash(docker:*)",
+      "Bash(if [ ! -f .env ])",
+      "Bash(then touch .env)",
+      "Bash(fi)",
+      "Bash(npm run build)",
+      "Bash(./container/build.sh:*)",
+      "Bash(grep:*)",
+      "Bash(node -e \"const c=require\\(''./store/auth/creds.json''\\);console.log\\(c.me.id.split\\('':''\\)[0].split\\(''@''\\)[0]\\)\")",
+      "Bash(if [ -f .env ])",
+      "Bash(then cat .env)",
+      "Bash(else echo \".env file not found\")",
+      "Bash(launchctl:*)",
+      "Bash(git:*)",
+      "WebSearch",
+      "WebFetch(domain:docs.claude.com)",
+      "Bash(./build.sh:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(timeout 5 node:*)",
+      "Bash(log show:*)",
+      "Bash(ls:*)",
+      "Bash(sqlite3:*)"
+    ]
+  }
+}

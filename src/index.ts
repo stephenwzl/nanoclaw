@@ -9,6 +9,8 @@ import {
   TRIGGER_PATTERN,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
+import { FeishuChannel } from './channels/feishu.js';
+import { readEnvFile } from './env.js';
 import {
   ContainerOutput,
   runContainerAgent,
@@ -52,8 +54,14 @@ let lastAgentTimestamp: Record<string, string> = {};
 let messageLoopRunning = false;
 
 let whatsapp: WhatsAppChannel;
+let feishu: FeishuChannel;
 const channels: Channel[] = [];
 const queue = new GroupQueue();
+
+// 从环境变量读取要启用的 channel
+const env = readEnvFile(['ENABLE_WHATSAPP', 'ENABLE_FEISHU']);
+const ENABLE_WHATSAPP = env.ENABLE_WHATSAPP === 'true';
+const ENABLE_FEISHU = env.ENABLE_FEISHU !== 'false'; // 默认启用飞书
 
 function loadState(): void {
   lastTimestamp = getRouterState('last_timestamp') || '';
@@ -475,9 +483,27 @@ async function main(): Promise<void> {
   };
 
   // Create and connect channels
-  whatsapp = new WhatsAppChannel(channelOpts);
-  channels.push(whatsapp);
-  await whatsapp.connect();
+  if (ENABLE_WHATSAPP) {
+    whatsapp = new WhatsAppChannel(channelOpts);
+    channels.push(whatsapp);
+    await whatsapp.connect();
+    logger.info('WhatsApp channel 已启用');
+  } else {
+    logger.info('WhatsApp channel 已禁用');
+  }
+
+  if (ENABLE_FEISHU) {
+    feishu = new FeishuChannel(channelOpts);
+    channels.push(feishu);
+    await feishu.connect();
+    logger.info('飞书 channel 已启用');
+  } else {
+    logger.info('飞书 channel 已禁用');
+  }
+
+  if (channels.length === 0) {
+    throw new Error('没有启用的 channel，请在 .env 中设置 ENABLE_WHATSAPP=true 或 ENABLE_FEISHU=true');
+  }
 
   // Start subsystems (independently of connection handler)
   startSchedulerLoop({
@@ -505,7 +531,9 @@ async function main(): Promise<void> {
     registeredGroups: () => registeredGroups,
     registerGroup,
     syncGroupMetadata: (force) =>
-      whatsapp?.syncGroupMetadata(force) ?? Promise.resolve(),
+      ENABLE_WHATSAPP
+        ? whatsapp?.syncGroupMetadata(force) ?? Promise.resolve()
+        : Promise.resolve(),
     getAvailableGroups,
     writeGroupsSnapshot: (gf, im, ag, rj) =>
       writeGroupsSnapshot(gf, im, ag, rj),
