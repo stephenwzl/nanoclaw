@@ -26,7 +26,11 @@
       "Bash(timeout 5 node:*)",
       "Bash(log show:*)",
       "Bash(ls:*)",
-      "Bash(sqlite3:*)"
+      "Bash(sqlite3:*)",
+      "Bash(tail -100 /Users/wangzhilong/Documents/nanoclaw/groups/main/logs/*.log)",
+      "Bash(pm2 logs nanoclaw --lines 50)",
+      "Bash(node -e \":*)",
+      "Bash(# 持续监控日志 timeout 30 tail -f /Users/wangzhilong/Documents/nanoclaw/logs/nanoclaw.log)"
     ]
   }
 }

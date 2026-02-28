@@ -290,7 +290,8 @@ export function validateMount(
   }
 
   // Determine effective readonly status
-  const requestedReadWrite = mount.readonly === false;
+  // Use truthiness check to handle both boolean false and numeric 0 from SQLite JSON
+  const requestedReadWrite = mount.readonly !== true && mount.readonly !== 1;
   let effectiveReadonly = true; // Default to readonly
 
   if (requestedReadWrite) {
