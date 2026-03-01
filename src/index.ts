@@ -7,6 +7,7 @@ import {
   MAIN_GROUP_FOLDER,
   POLL_INTERVAL,
   TRIGGER_PATTERN,
+  USE_CONTAINER,
 } from './config.js';
 import { WhatsAppChannel } from './channels/whatsapp.js';
 import { FeishuChannel } from './channels/feishu.js';
@@ -21,6 +22,7 @@ import {
   cleanupOrphans,
   ensureContainerRuntimeRunning,
 } from './container-runtime.js';
+import { runHostAgent } from './host-runner.js';
 import {
   getAllChats,
   getAllRegisteredGroups,
@@ -298,7 +300,9 @@ async function runAgent(
     : undefined;
 
   try {
-    const output = await runContainerAgent(
+    // Choose runner based on RUN_MODE configuration
+    const runner = USE_CONTAINER ? runContainerAgent : runHostAgent;
+    const output = await runner(
       group,
       {
         prompt,
@@ -449,6 +453,10 @@ function recoverPendingMessages(): void {
 }
 
 function ensureContainerSystemRunning(): void {
+  if (!USE_CONTAINER) {
+    logger.info('Running in host mode - no container isolation');
+    return;
+  }
   ensureContainerRuntimeRunning();
   cleanupOrphans();
 }

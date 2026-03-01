@@ -6,7 +6,32 @@ import { readEnvFile } from './env.js';
 // Read config values from .env (falls back to process.env).
 // Secrets are NOT read here — they stay on disk and are loaded only
 // where needed (container-runner.ts) to avoid leaking to child processes.
-const envConfig = readEnvFile(['ASSISTANT_NAME', 'ASSISTANT_HAS_OWN_NUMBER']);
+const envConfig = readEnvFile([
+  'ASSISTANT_NAME',
+  'ASSISTANT_HAS_OWN_NUMBER',
+  'RUN_MODE',
+]);
+
+// ============================================================================
+// RUN MODE: container (default) vs host
+// ============================================================================
+// - container: Agent runs in Docker container with filesystem isolation
+// - host: Agent runs directly on host with full filesystem access
+// Host mode is for single-user setups where you trust the agent completely.
+export type RunMode = 'container' | 'host';
+export const RUN_MODE: RunMode = (
+  process.env.RUN_MODE || envConfig.RUN_MODE || 'container'
+) as RunMode;
+export const USE_CONTAINER = RUN_MODE === 'container';
+
+// Path to agent-runner entry point (used in host mode)
+export const AGENT_RUNNER_PATH = path.join(
+  process.cwd(),
+  'container',
+  'agent-runner',
+  'dist',
+  'index.js',
+);
 
 export const ASSISTANT_NAME =
   process.env.ASSISTANT_NAME || envConfig.ASSISTANT_NAME || 'Andy';

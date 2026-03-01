@@ -4,7 +4,26 @@ Personal Claude assistant. See [README.md](README.md) for philosophy and setup. 
 
 ## Quick Context
 
-Single Node.js process that connects to WhatsApp, routes messages to Claude Agent SDK running in containers (Linux VMs). Each group has isolated filesystem and memory.
+Single Node.js process that connects to WhatsApp, routes messages to Claude Agent SDK. Supports two run modes:
+
+- **Container mode (default)**: Agent runs in Docker containers with filesystem isolation. Each group has isolated filesystem and memory.
+- **Host mode**: Agent runs directly on host with full filesystem access. No isolation, but simpler setup for single-user scenarios.
+
+## Run Mode Configuration
+
+Set `RUN_MODE=host` in your `.env` file to disable container isolation:
+
+```bash
+# .env
+RUN_MODE=host
+```
+
+**Host mode trade-offs:**
+- ✅ Agent can access your entire home directory and projects
+- ✅ No container build/maintenance required
+- ✅ Faster startup (no container spin-up)
+- ⚠️ Agent has full filesystem access (trust required)
+- ⚠️ No cross-group isolation (all groups share same environment)
 
 ## Key Files
 
@@ -14,11 +33,12 @@ Single Node.js process that connects to WhatsApp, routes messages to Claude Agen
 | `src/channels/whatsapp.ts` | WhatsApp connection, auth, send/receive |
 | `src/ipc.ts` | IPC watcher and task processing |
 | `src/router.ts` | Message formatting and outbound routing |
-| `src/config.ts` | Trigger pattern, paths, intervals |
-| `src/container-runner.ts` | Spawns agent containers with mounts |
+| `src/config.ts` | Trigger pattern, paths, intervals, run mode |
+| `src/container-runner.ts` | Spawns agent containers with mounts (container mode) |
+| `src/host-runner.ts` | Spawns agent directly on host (host mode) |
 | `src/task-scheduler.ts` | Runs scheduled tasks |
 | `src/db.ts` | SQLite operations |
-| `groups/{name}/CLAUDE.md` | Per-group memory (isolated) |
+| `groups/{name}/CLAUDE.md` | Per-group memory (isolated in container mode) |
 | `container/skills/agent-browser.md` | Browser automation tool (available to all agents via Bash) |
 
 ## Skills
