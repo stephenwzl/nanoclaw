@@ -7,12 +7,14 @@ import {
   MAIN_GROUP_FOLDER,
   SCHEDULER_POLL_INTERVAL,
   TIMEZONE,
+  USE_CONTAINER,
 } from './config.js';
 import {
   ContainerOutput,
   runContainerAgent,
   writeTasksSnapshot,
 } from './container-runner.js';
+import { runHostAgent } from './host-runner.js';
 import {
   getAllTasks,
   getDueTasks,
@@ -133,7 +135,9 @@ async function runTask(
   };
 
   try {
-    const output = await runContainerAgent(
+    // Choose runner based on RUN_MODE configuration
+    const runner = USE_CONTAINER ? runContainerAgent : runHostAgent;
+    const output = await runner(
       group,
       {
         prompt: task.prompt,
