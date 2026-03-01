@@ -19,9 +19,9 @@ const envConfig = readEnvFile([
 // - host: Agent runs directly on host with full filesystem access
 // Host mode is for single-user setups where you trust the agent completely.
 export type RunMode = 'container' | 'host';
-export const RUN_MODE: RunMode = (
-  process.env.RUN_MODE || envConfig.RUN_MODE || 'container'
-) as RunMode;
+export const RUN_MODE: RunMode = (process.env.RUN_MODE ||
+  envConfig.RUN_MODE ||
+  'container') as RunMode;
 export const USE_CONTAINER = RUN_MODE === 'container';
 
 // Path to agent-runner entry point (used in host mode)
